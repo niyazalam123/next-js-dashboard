@@ -11,7 +11,7 @@ function checkApiKey(req: Request) {
     return true;
 }
 
-export async function Post(request: NextRequest) {
+export async function POST(request: NextRequest) {
     // check varifications of api key
     // if(!checkApiKey(request)){
     //     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -27,5 +27,18 @@ export async function Post(request: NextRequest) {
         return NextResponse.json({message:"data upload successfully",success: true},{status:200})
     } catch (error:any) {
         return NextResponse.json({ message: "Error uploading data", success: false, error: error.message }, { status: 500 });
+    }
+}
+
+
+// create get route
+
+export async function GET(req:NextRequest){
+    try {
+        dbConnect();
+        const allleads = await LeadModel.find();
+        return NextResponse.json(allleads,{status:200});
+    } catch (error) {
+        return NextResponse.json({message:"Failed to get data",success:false},{status:400})
     }
 }
