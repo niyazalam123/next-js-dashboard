@@ -13,9 +13,9 @@ function checkApiKey(req: Request) {
 
 export async function POST(request: NextRequest) {
     // check varifications of api key
-    // if(!checkApiKey(request)){
-    //     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    // }
+    if(!checkApiKey(request)){
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
 
     try {
         dbConnect();
@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
             ...payLoad
         });
         await leads.save();
-        return NextResponse.json({message:"data upload successfully",success: true},{status:200})
+        const response = NextResponse.json({message:"data upload successfully",success: true},{status:200});
+        response.headers.set('Access-Control-Allow-Origin', '*');
+        response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        response.headers.set('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+        return response;
     } catch (error:any) {
         return NextResponse.json({ message: "Error uploading data", success: false, error: error.message }, { status: 500 });
     }
