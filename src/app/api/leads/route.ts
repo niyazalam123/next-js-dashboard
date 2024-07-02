@@ -5,7 +5,7 @@ import { NextResponse, NextRequest } from "next/server";
 // secure api route
 function checkApiKey(req: Request) {
     const apiKey = req.headers.get('x-api-key');
-    if (!apiKey || apiKey !== process.env.lEADS_API_KEY) {
+    if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_lEADS_API_KEY) {
         return false;
     }
     return true;
