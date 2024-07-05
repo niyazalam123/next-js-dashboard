@@ -23,10 +23,10 @@ export async function POST(req: NextRequest) {
         const todosData = await req.json();
 
         // Save the todo to the todo schema
-        const savedTodo:TodosTypes = await new TodoModel(todosData).save();
+        const savedTodo:TodosTypes | any = await new TodoModel(todosData).save();
 
         // Get the ID of the saved todo and convert it to a string
-        const todoId2:string = savedTodo._id.toString();
+        let todoId2 = savedTodo._id.toString();
 
         // Map over all users and set this id to their schema
         const updateUserPromises = users.map((user:any) => {
