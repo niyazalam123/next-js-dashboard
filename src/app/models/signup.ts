@@ -6,6 +6,10 @@ export interface TodosTypes extends Document {
     isVisited:boolean;
 }
 
+export interface Products extends Document{
+    productId:string;
+}
+
 export interface userTypes extends Document{
     name:string;
     email:string;
@@ -16,7 +20,16 @@ export interface userTypes extends Document{
     forgotPasswordTokenExpiry:Date;
     isAssign:boolean;
     isBlock:boolean;
+    products:Products[];
 }
+
+
+
+const ProductsSchema = new Schema<Products>({
+    productId:{
+        type:String,
+    }
+})
 
 const todosSchema = new Schema<TodosTypes>({
     todoId:{type:String},
@@ -54,7 +67,8 @@ const userSchema = new Schema<userTypes>({
     isBlock:{
         type:Boolean,
         default:false
-    }
+    },
+    products:[ProductsSchema]
 },{timestamps:true})
 
 const userModel = (mongoose.models.Users as mongoose.Model<userTypes>) || mongoose.model<userTypes>("Users",userSchema);
