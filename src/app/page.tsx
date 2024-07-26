@@ -6,14 +6,14 @@ import SelectBox from "./_components/SelectBox";
 import TodoListing from "./_components/TodoListing";
 
 
-async function GetAllProducts() {
-  const allData = await fetch("https://dummyjson.com/products");
-  const repon = await allData.json();
-  return repon;
-}
+// async function GetAllProducts() {
+//   const allData = await fetch("https://dummyjson.com/products");
+//   const repon = await allData.json();
+//   return repon;
+// }
 
 export default async function Home() {
-  const data = await GetAllProducts();
+  // const data = await GetAllProducts();
   return (
     <>
       {/* <Products data={data.products}/> */}
@@ -21,7 +21,7 @@ export default async function Home() {
       {/* <ListingPage data={data}/> */}
       {/* <SelectBox /> */}
       <h1>Back to home page</h1>
-      <TodoListing />
+      {/* <TodoListing /> */}
     </>
   );
 }
