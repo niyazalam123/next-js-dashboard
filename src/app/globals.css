@@ -4,3 +4,24 @@
     box-sizing: border-box;
 }
 
+.container{
+    max-width: 1450px;
+    width:100%;
+    padding-left: 25px;
+    padding-right: 25px;
+    margin-left: auto;
+    margin-right: auto;
+}
+ul{
+    list-style-type: none;
+}
+ol{
+    list-style: none;
+}
+
+@media only screen and (max-width:767px){
+    .container{
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
