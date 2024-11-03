@@ -6,9 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 export async function GET(req: NextRequest) {
+    console.log("req00000000",req);
     try {
         await dbConnect();
         const url = new URL(req.url);
+        console.log("url88888888",url);
         const page = parseInt(url.searchParams.get('page') || '1', 10);
         const limit = parseInt(url.searchParams.get('limit') || '1', 10);
         const blogs = await Blog.find()

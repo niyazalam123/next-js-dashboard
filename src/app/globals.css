@@ -18,6 +18,9 @@ ul{
 ol{
     list-style: none;
 }
+.ql-toolbar.ql-snow + .ql-container.ql-snow{
+    min-height: 200px;
+}
 
 @media only screen and (max-width:767px){
     .container{
