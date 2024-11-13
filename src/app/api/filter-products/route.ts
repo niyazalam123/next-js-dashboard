@@ -33,12 +33,18 @@ export async function GET(req: NextRequest) {
         const color = searchParams.get("color");
         const size = searchParams.get("size");
         const sort = searchParams.get("sort");
+        const priceRange = searchParams.get("price");
         const query: any = {};
         if (color) query.color = color;
         if (size) query.size = size;
 
         // Determine sort order for price
         const priceSort = sort === "asc" ? 1 : sort === "des" ? -1 : undefined;
+
+        if (priceRange) {
+            const [minPrice, maxPrice] = priceRange.split("-").map(Number);
+            query.price = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
+        }
 
         // now get data based on these data
         const products = await FilterProduct.find(query).sort(priceSort ? { price: priceSort } : {});

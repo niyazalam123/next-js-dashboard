@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaAngleDown } from "react-icons/fa6";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SORT_OPTIONS = [
   {
@@ -52,82 +52,72 @@ const SIZE_OPTIONS = [
     value: "l",
   },
 ] as const;
+
+const PRICE_OPTIONS = [
+  { name: "Under $1000", value: "0-1000" },
+  { name: "$1000 to $2000", value: "1000-2000" },
+  { name: "$2000 to $3000", value: "2000-3000" },
+  { name: "$3000 to $4000", value: "3000-4000" },
+  { name: "Custom", value: "custom" },
+] as const;
 const FilterPage = ({ productsData }: any) => {
-  const [filter, setFilter] = useState({
-    sort: "",
-    color: "",
-    size: "",
-  });
+  const [filter, setFilter] = useState({ sort: "", color: "", size: "" });
   const route = useRouter();
   const [filterData, setFilterData] = useState<any>([]);
+  const [priceRange, setPriceRange] = useState("");
+  const [customMin, setCustomMin] = useState(10);
+  const [customMax, setCustomMax] = useState(20);
+  const minGap = 0;
+  const sliderMaxValue = 50000;
 
-  // handle filter function
-  function handleFilter(e: any) {
-    const { name, value } = e.target;
-    setFilter((prev: any) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  }
+  function handleFilter() {}
 
   useEffect(() => {
-    let querySlug = "";
+    slideOne();
+    slideTwo();
+  }, [customMin, customMax]);
 
-    if (filter.color) {
-      querySlug += querySlug ? `&color=${filter.color}` : `?color=${filter.color}`;
+  const slideOne = useCallback(() => {
+    if (customMax - customMin <= minGap) {
+      setCustomMin(customMax - minGap);
     }
-    if (filter.size) {
-      querySlug += querySlug ? `&size=${filter.size}` : `?size=${filter.size}`;
-    }
-    if (filter.sort) {
-      querySlug += querySlug ? `&sort=${filter.sort}` : `?sort=${filter.sort}`;
-    }
+    fillColor();
+  }, [customMin, customMax, minGap]);
 
-    // Only push to the router if there is a query slug
-    if (querySlug) {
-      route.push(querySlug);
+  const slideTwo = useCallback(() => {
+    if (customMax - customMin <= minGap) {
+      setCustomMax(customMin + minGap);
     }
-  }, [filter, route]);
+    fillColor();
+  }, [customMin, customMax, minGap]);
 
-  useEffect(() => {
-    async function getFilteredData() {
-      try {
-        let apiSlug = "/api/filter-products";
-        let querySlug = ""
-        if (filter.sort) {
-          querySlug += querySlug ?  `&sort=${filter.sort}` : `?sort=${filter.sort}`;
-        }
-        if (filter.color) {
-          querySlug += querySlug ? `&color=${filter.color}` : `?color=${filter.color}`;
-        }
-        if (filter.size) {
-          querySlug += querySlug ? `&size=${filter.size}` : `?size=${filter.size}`;
-        }
-        if (querySlug){
-          apiSlug += querySlug
-        }
-        const resp = await fetch(apiSlug);
-        if (resp.ok) {
-          const data = await resp.json();
-          setFilterData(data);
-        } else {
-          setFilterData([]);
-        }
-      } catch (error) {
-        console.log("error", error);
-        setFilterData([]);
-      }
+  const fillColor = () => {
+    const percent1 = (customMin / sliderMaxValue) * 100;
+    const percent2 = (customMax / sliderMaxValue) * 100;
+    const sliderTrack: any = document.querySelector(".slider-track");
+    if (sliderTrack) {
+      sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}% , #3264fe ${percent1}% , #3264fe ${percent2}%, #dadae5 ${percent2}%)`;
     }
-    getFilteredData();
-  }, [filter.color, filter.size, filter.sort]);
+  };
 
-  console.log(filterData);
+  const handleApply = (e: any) => {
+    e.preventDefault();
+    // You can add logic here to apply the selected range
+    console.log("Applying Min:", customMin, "Max:", customMax);
+  };
 
   return (
     <>
       <style jsx>{`
+        ._price_range1 {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+        }
+        ._price_range1 span {
+          display: block;
+          margin-left: 20px;
+        }
         ._parent_filter1 {
           max-width: 1450px;
           width: 100%;
@@ -441,52 +431,90 @@ const FilterPage = ({ productsData }: any) => {
                     </span>
                   </summary>
                   <ul>
-                    <li>
-                      <input type="radio" id="_one9" name="price" />
-                      <label htmlFor="_one9">Under $1000</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="_one10" name="price" />
-                      <label htmlFor="_one10">$1000 to $2000</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="_one11" name="price" />
-                      <label htmlFor="_one11">$2000 to $3000</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="_one12" name="price" />
-                      <label htmlFor="_one12">Custom</label>
-                    </li>
-                    <li className="_parent_filter7">
-                      <div className="_parent_filter8">
-                        <form className="_parent_filter80">
-                          <input type="number" placeholder="Min" />
-                          <span>To</span>
-                          <input type="number" placeholder="Max" />
-                          <button>Apply</button>
-                        </form>
-                      </div>
-                    </li>
-                    <li>
-                      <div>Price Range</div>
-                      <div className="container122">
-                        <div className="slider-track"></div>
+                    {PRICE_OPTIONS?.map((price: any) => (
+                      <li key={price?.name}>
                         <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          // value="30"
-                          id="slider-1"
+                          type="radio"
+                          id={`price-${price?.name}`}
+                          name="price"
+                          value={price?.value}
+                          onChange={(e: any) => setPriceRange(price?.value)}
+                          checked={priceRange === price?.value}
                         />
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          // value="70"
-                          id="slider-2"
-                        />
-                      </div>
-                    </li>
+                        <label htmlFor={`price-${price?.name}`}>
+                          {price?.name}
+                        </label>
+                      </li>
+                    ))}
+                    {priceRange === "custom" && (
+                      <>
+                        <li className="_parent_filter7">
+                          <div className="_parent_filter8">
+                            <form
+                              className="_parent_filter80"
+                              onSubmit={handleApply}
+                            >
+                              <input
+                                type="number"
+                                placeholder="Min"
+                                value={customMin}
+                                onChange={(e) => {
+                                  if (e.target.value.length > 6) {
+                                    return;
+                                  } else {
+                                    setCustomMin(Number(e.target.value));
+                                  }
+                                }}
+                              />
+                              <span>To</span>
+                              <input
+                                type="number"
+                                placeholder="Max"
+                                value={customMax}
+                                onChange={(e) => {
+                                  if (e.target.value.length > 6) {
+                                    return;
+                                  } else {
+                                    setCustomMax(Number(e.target.value));
+                                  }
+                                }}
+                              />
+                              <button type="submit">Apply</button>
+                            </form>
+                          </div>
+                        </li>
+                        <li>
+                          <div>Price Range</div>
+                          {/* <div className="_price_range1">
+                        <span>${customMin}</span>
+                        <span>${customMax}</span>
+                      </div> */}
+                          <div className="container122">
+                            <div className="slider-track"></div>
+                            <input
+                              type="range"
+                              min="0"
+                              max={sliderMaxValue - 1}
+                              value={customMin}
+                              id="slider-1"
+                              onChange={(e) =>
+                                setCustomMin(Number(e.target.value))
+                              }
+                            />
+                            <input
+                              type="range"
+                              min="1"
+                              max={sliderMaxValue}
+                              value={customMax}
+                              id="slider-2"
+                              onChange={(e) =>
+                                setCustomMax(Number(e.target.value))
+                              }
+                            />
+                          </div>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </details>
               </div>
