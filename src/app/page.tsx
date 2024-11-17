@@ -1,9 +1,11 @@
+"use client";
 import Image from "next/image";
 import Products from "./_components/Products";
 import FilterBasedOnLead from "./_components/FilterBasedOnLead";
 import ListingPage from "./_components/listingPage";
 import SelectBox from "./_components/SelectBox";
 import TodoListing from "./_components/TodoListing";
+import { signOut, useSession } from "next-auth/react";
 
 
 // async function GetAllProducts() {
@@ -12,7 +14,10 @@ import TodoListing from "./_components/TodoListing";
 //   return repon;
 // }
 
-export default async function Home() {
+export default function Home() {
+  const { data: session,status } = useSession();
+  console.log("session",session)
+  console.log("status",status)
   // const data = await GetAllProducts();
   return (
     <>
@@ -22,6 +27,7 @@ export default async function Home() {
       {/* <SelectBox /> */}
       <h1>Back to home page</h1>
       {/* <TodoListing /> */}
+      <button onClick={(e:any)=>signOut()}>Logout</button>
     </>
   );
 }
